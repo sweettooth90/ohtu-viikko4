@@ -52,5 +52,4 @@ public class KassapaateTest {
         kassa.lataa(kortti, -10);
         verify(kortti, times(0)).lataa(-10);
     }
-      
 }
