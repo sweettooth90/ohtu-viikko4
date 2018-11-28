@@ -3,193 +3,162 @@ package ohtu.intjoukkosovellus;
 
 public class IntJoukko {
 
-    public final static int KAPASITEETTI = 5, // aloitustalukon koko
-                            OLETUSKASVATUS = 5;  // luotava uusi taulukko on 
-    // näin paljon isompi kuin vanha
-    private int kasvatuskoko;     // Uusi taulukko on tämän verran vanhaa suurempi.
-    private int[] ljono;      // Joukon luvut säilytetään taulukon alkupäässä. 
-    private int alkioidenLkm;    // Tyhjässä joukossa alkioiden_määrä on nolla. 
+    public final static int KAPASITEETTI = 5, OLETUSKASVATUS = 5;
+    private int kasvatuskoko;
+    private int[] ljono;
+    private int alkioLkm;
+
 
     public IntJoukko() {
         ljono = new int[KAPASITEETTI];
-        for (int i = 0; i < ljono.length; i++) {
-            ljono[i] = 0;
-        }
-        alkioidenLkm = 0;
+        taytaTaulukko(ljono);
+        alkioLkm = 0;
         this.kasvatuskoko = OLETUSKASVATUS;
     }
+
 
     public IntJoukko(int kapasiteetti) {
         if (kapasiteetti < 0) {
             return;
         }
         ljono = new int[kapasiteetti];
-        for (int i = 0; i < ljono.length; i++) {
-            ljono[i] = 0;
-        }
-        alkioidenLkm = 0;
+        taytaTaulukko(ljono);
+        alkioLkm = 0;
         this.kasvatuskoko = OLETUSKASVATUS;
-
     }
     
-    
+
     public IntJoukko(int kapasiteetti, int kasvatuskoko) {
-        if (kapasiteetti < 0) {
-            throw new IndexOutOfBoundsException("Kapasitteetti väärin");//heitin vaan jotain :D
-        }
-        if (kasvatuskoko < 0) {
-            throw new IndexOutOfBoundsException("kapasiteetti2");//heitin vaan jotain :D
-        }
         ljono = new int[kapasiteetti];
-        for (int i = 0; i < ljono.length; i++) {
-            ljono[i] = 0;
-        }
-        alkioidenLkm = 0;
+        taytaTaulukko(ljono);
         this.kasvatuskoko = kasvatuskoko;
-
     }
+
 
     public boolean lisaa(int luku) {
-
-        int eiOle = 0;
-        if (alkioidenLkm == 0) {
-            ljono[0] = luku;
-            alkioidenLkm++;
-            return true;
-        } else {
-        }
-        if (!kuuluu(luku)) {
-            ljono[alkioidenLkm] = luku;
-            alkioidenLkm++;
-            if (alkioidenLkm % ljono.length == 0) {
-                int[] taulukkoOld = new int[ljono.length];
-                taulukkoOld = ljono;
-                kopioiTaulukko(ljono, taulukkoOld);
-                ljono = new int[alkioidenLkm + kasvatuskoko];
-                kopioiTaulukko(taulukkoOld, ljono);
+        if (!lukuKuuluu(luku)) {
+            ljono[alkioLkm] = luku;
+            alkioLkm++;
+            if (alkioLkm % ljono.length == 0) {
+                int[] taulukkoVanha = ljono;
+                kopioiTaulukko(ljono, taulukkoVanha);
+                ljono = new int[alkioLkm + kasvatuskoko];
+                kopioiTaulukko(taulukkoVanha, ljono);
             }
             return true;
         }
         return false;
     }
 
-    public boolean kuuluu(int luku) {
-        int on = 0;
-        for (int i = 0; i < alkioidenLkm; i++) {
+
+    public boolean lukuKuuluu(int luku) {
+        for (int i = 0; i < alkioLkm; i++) {
             if (luku == ljono[i]) {
-                on++;
+                return true;
             }
         }
-        if (on > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
+
 
     public boolean poista(int luku) {
-        int kohta = -1;
-        int apu;
-        for (int i = 0; i < alkioidenLkm; i++) {
+        for (int i = 0; i < alkioLkm; i++) {
             if (luku == ljono[i]) {
-                kohta = i; //siis luku löytyy tuosta kohdasta :D
-                ljono[kohta] = 0;
-                break;
+                ljono[i] = ljono[alkioLkm-1];
+                ljono[alkioLkm-1] = 0;
+                alkioLkm--;
+                return true;
             }
         }
-        if (kohta != -1) {
-            for (int j = kohta; j < alkioidenLkm - 1; j++) {
-                apu = ljono[j];
-                ljono[j] = ljono[j + 1];
-                ljono[j + 1] = apu;
-            }
-            alkioidenLkm--;
-            return true;
-        }
-
-
         return false;
     }
+
+
+    public void taytaTaulukko(int[] ljono) {
+        for (int i = 0; i < ljono.length; i++) {
+            ljono[i] = 0;
+        }
+    }
+
 
     private void kopioiTaulukko(int[] vanha, int[] uusi) {
         for (int i = 0; i < vanha.length; i++) {
             uusi[i] = vanha[i];
         }
-
     }
 
+
     public int mahtavuus() {
-        return alkioidenLkm;
+        return alkioLkm;
+    }
+   
+
+    public static IntJoukko yhdiste(IntJoukko a, IntJoukko b) {
+        int[] aTaulu = a.toIntArray();
+        int[] bTaulu = b.toIntArray();
+        IntJoukko yhdista = new IntJoukko();
+        for (int i = 0; i < aTaulu.length; i++) {
+            yhdista.lisaa(aTaulu[i]);
+        }
+        for (int i = 0; i < bTaulu.length; i++) {
+            yhdista.lisaa(bTaulu[i]);
+        }
+        return yhdista;
+    }
+
+
+    public static IntJoukko eikkaus(IntJoukko a, IntJoukko b) {
+        int[] aTaulu = a.toIntArray();
+        int[] bTaulu = b.toIntArray();
+        IntJoukko leikkaa = new IntJoukko();
+        for (int i = 0; i < aTaulu.length; i++) {
+            for (int j = 0; j < bTaulu.length; j++) {
+                if (aTaulu[i] == bTaulu[j]) {
+                    leikkaa.lisaa(bTaulu[j]);
+                }
+            }
+        }
+        return leikkaa;
+    }
+
+
+    public static IntJoukko teeErotus (IntJoukko a, IntJoukko b) {
+        int[] aTaulu = a.toIntArray();
+        int[] bTaulu = b.toIntArray();
+        IntJoukko erota = new IntJoukko();
+        for (int i = 0; i < aTaulu.length; i++) {
+            erota.lisaa(aTaulu[i]);
+        }
+        for (int i = 0; i < bTaulu.length; i++) {
+            erota.poista(i);
+        }
+        return erota;
     }
 
 
     @Override
     public String toString() {
-        if (alkioidenLkm == 0) {
+        if (alkioLkm == 0) {
             return "{}";
-        } else if (alkioidenLkm == 1) {
+        } else if (alkioLkm == 1) {
             return "{" + ljono[0] + "}";
         } else {
             String tuotos = "{";
-            for (int i = 0; i < alkioidenLkm - 1; i++) {
-                tuotos += ljono[i];
-                tuotos += ", ";
+            for (int i = 0; i < alkioLkm - 1; i++) {
+                tuotos += ljono[i] + ", ";
             }
-            tuotos += ljono[alkioidenLkm - 1];
-            tuotos += "}";
+            tuotos += ljono[alkioLkm - 1] + "}";
             return tuotos;
         }
     }
 
+    
     public int[] toIntArray() {
-        int[] taulu = new int[alkioidenLkm];
+        int[] taulu = new int[alkioLkm];
         for (int i = 0; i < taulu.length; i++) {
             taulu[i] = ljono[i];
         }
         return taulu;
-    }
-   
-
-    public static IntJoukko yhdiste(IntJoukko a, IntJoukko b) {
-        IntJoukko x = new IntJoukko();
-        int[] aTaulu = a.toIntArray();
-        int[] bTaulu = b.toIntArray();
-        for (int i = 0; i < aTaulu.length; i++) {
-            x.lisaa(aTaulu[i]);
-        }
-        for (int i = 0; i < bTaulu.length; i++) {
-            x.lisaa(bTaulu[i]);
-        }
-        return x;
-    }
-
-    public static IntJoukko leikkaus(IntJoukko a, IntJoukko b) {
-        IntJoukko y = new IntJoukko();
-        int[] aTaulu = a.toIntArray();
-        int[] bTaulu = b.toIntArray();
-        for (int i = 0; i < aTaulu.length; i++) {
-            for (int j = 0; j < bTaulu.length; j++) {
-                if (aTaulu[i] == bTaulu[j]) {
-                    y.lisaa(bTaulu[j]);
-                }
-            }
-        }
-        return y;
-
-    }
-    
-    public static IntJoukko erotus ( IntJoukko a, IntJoukko b) {
-        IntJoukko z = new IntJoukko();
-        int[] aTaulu = a.toIntArray();
-        int[] bTaulu = b.toIntArray();
-        for (int i = 0; i < aTaulu.length; i++) {
-            z.lisaa(aTaulu[i]);
-        }
-        for (int i = 0; i < bTaulu.length; i++) {
-            z.poista(i);
-        }
- 
-        return z;
     }
         
 }
