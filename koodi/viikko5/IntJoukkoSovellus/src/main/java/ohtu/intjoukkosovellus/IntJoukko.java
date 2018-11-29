@@ -107,7 +107,7 @@ public class IntJoukko {
     }
 
 
-    public static IntJoukko eikkaus(IntJoukko a, IntJoukko b) {
+    public static IntJoukko leikkaus(IntJoukko a, IntJoukko b) {
         int[] aTaulu = a.toIntArray();
         int[] bTaulu = b.toIntArray();
         IntJoukko leikkaa = new IntJoukko();
@@ -122,7 +122,7 @@ public class IntJoukko {
     }
 
 
-    public static IntJoukko teeErotus (IntJoukko a, IntJoukko b) {
+    public static IntJoukko erotus (IntJoukko a, IntJoukko b) {
         int[] aTaulu = a.toIntArray();
         int[] bTaulu = b.toIntArray();
         IntJoukko erota = new IntJoukko();
